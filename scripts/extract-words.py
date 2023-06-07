@@ -44,17 +44,20 @@ def extract_wordforms(conllu_file):
         table = f'wordforms_{language}'
         for sentence in conllu.parse_incr(f):
             sentence_id = sentence.metadata.get('sent_id', 'NA')
-            for word in sentence:
-                if word['upos'] != 'PUNCT':
-                    wordform = word['form']
-                cur.execute(
-                f''' INSERT INTO {table} (wordform)
-                    VALUES (:wordform)
-                ON CONFLICT (wordform) DO NOTHING
-                ;''', {'wordform': wordform}
-                )
-                conn.commit()
-                print(f"Processed {sentence_id}: {wordform}")
+            # For ET, process only newspaper sentences (aja_ is unique to ET)
+            if (sentence_id.startswith('aja') and not sentence_id.startswith(('aja_horisont', 'aja_luup'))) \
+            or language != 'et':
+                for word in sentence:
+                    if word['upos'] != 'PUNCT':
+                        wordform = word['form']
+                    cur.execute(
+                    f''' INSERT INTO {table} (wordform)
+                        VALUES (:wordform)
+                    ON CONFLICT (wordform) DO NOTHING
+                    ;''', {'wordform': wordform}
+                    )
+                    conn.commit()
+                    print(f"Processed {sentence_id}: {wordform}")
         print("Finished")
 
 #%%
