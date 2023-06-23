@@ -27,9 +27,16 @@ def process(filename):
     with open(filepath, 'r') as f, open(ud_proj_combined_fp, 'a') as outfile:
         for sentence in conllu.parse_incr(f):
             sentence_id = sentence.metadata.get('sent_id', 'NA')
-            # For Estonian, process only newspaper sentences
-            if (sentence_id.startswith('aja') and not sentence_id.startswith(('aja_horisont', 'aja_luup'))) \
-            or language != 'et':
+            if language == 'et':
+                # ET Newspaper sentences start with 'aja_', excluding 'aja_horisont' and 'aja_luup'
+                if (sentence_id.startswith('aja_') and not sentence_id.startswith(('aja_horisont', 'aja_luup'))):
+                    outfile.write(sentence.serialize())
+            if language == 'tr':
+                # TR Newspaper sentences start with 'news_'
+                if sentence_id.startswith('news_'):
+                    outfile.write(sentence.serialize())
+            if language == 'hu':
+                # HU consists of only news corpora?
                 outfile.write(sentence.serialize())
 
 #%%
