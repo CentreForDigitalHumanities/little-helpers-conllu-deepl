@@ -12,7 +12,7 @@ conn = sqlite3.connect(DBPATH)
 conn.row_factory = sqlite3.Row
 cur = conn.cursor()
 
-#%%
+#%% Create a table per language to store word translations
 def prepare_db():
     cur.execute(
     '''CREATE TABLE IF NOT EXISTS wordforms_et (
@@ -38,6 +38,9 @@ prepare_db()
 
 #%%
 def extract_wordforms(conllu_file):
+    """ Extract wordforms from a .conllu file and store them in the database.
+    Store identical forms only once using ON CONFLICT DO NOTHING.
+    """
     filepath = os.path.join(PROJROOT, 'data', 'UD', conllu_file)
     with open(filepath, 'r') as f:
         language = conllu_file[:2]
@@ -60,7 +63,7 @@ def extract_wordforms(conllu_file):
                     print(f"Processed {sentence_id}: {wordform}")
         print("Finished")
 
-#%%
+#%% Create a list of .conllu files
 conllu_files = []
 
 for filename in os.listdir(os.path.join(PROJROOT, 'data', 'UD')):
@@ -70,9 +73,9 @@ for filename in os.listdir(os.path.join(PROJROOT, 'data', 'UD')):
 conllu_files = sorted(conllu_files)
 
 
-#%%
+#%% Process the conllu files and extract wordforms to database.
 for conllu_file in tqdm(conllu_files):
     extract_wordforms(conllu_file)
 
-#%%
+#%% Close the database connection
 conn.close()

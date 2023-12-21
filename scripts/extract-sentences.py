@@ -5,14 +5,14 @@ import pathlib
 import sqlite3
 from tqdm import tqdm
 
-#%%
+#%% SQLite database connection
 PROJROOT = pathlib.Path(__file__).parents[1].resolve()
 DBPATH = os.path.join(PROJROOT, 'data', 'sentences.db')
 conn = sqlite3.connect(DBPATH)
 conn.row_factory = sqlite3.Row
 cur = conn.cursor()
 
-#%%
+#%% Create table structures
 def prepare_db():
     cur.execute(
     '''CREATE TABLE IF NOT EXISTS corpus_files (
@@ -32,7 +32,7 @@ def prepare_db():
 
 prepare_db()
 
-#%%
+#%% Create a list of .conllu files
 conllu_files = []
 
 for filename in os.listdir(os.path.join(PROJROOT, 'data')):
@@ -41,7 +41,7 @@ for filename in os.listdir(os.path.join(PROJROOT, 'data')):
 
 conllu_files = sorted(conllu_files)
 
-#%%
+#%% Store corpus filename with language code
 for filename in conllu_files:
     filename = filename.removesuffix('.conllu')
     # DeepL uses ISO 639-1 codes
@@ -57,6 +57,7 @@ conn.commit()
 
 #%%
 def extract_sentences(conllu_file):
+    """ Extract sentences from a .conllu file and store them in the database"""
     filename = os.path.basename(conllu_file)
     basename = os.path.splitext(filename)[0]
 
@@ -74,11 +75,11 @@ def extract_sentences(conllu_file):
 
     conn.commit()
 
-#%%
+#%% Process the list of conllu files and extract sentences to database.
 for filename in tqdm(conllu_files):
     conllu_file = os.path.join(PROJROOT, 'data', filename)
     print(filename)
     extract_sentences(conllu_file)
 
-#%%
+#%% Close the database connection
 conn.close()

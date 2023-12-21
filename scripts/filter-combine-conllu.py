@@ -4,7 +4,7 @@ import os
 import pathlib
 from tqdm import tqdm
 
-#%%
+#%% Create a list of .conllu files
 PROJROOT = pathlib.Path(__file__).parents[1].resolve()
 conllu_files = []
 for filename in os.listdir(os.path.join(PROJROOT, 'data', 'UD')):
@@ -16,6 +16,9 @@ conllu_files
 
 #%%
 def process(filename):
+    """ Read a conllu file and iterate over the sentences.
+    If the sentence belongs to a newspaper collection, write it
+    to a combined file per corpus"""
     filepath = os.path.join(PROJROOT, 'data', 'UD', filename)
     language = filename[:2]
     basename = os.path.splitext(filename)[0]
@@ -39,6 +42,6 @@ def process(filename):
                 # HU consists of only news corpora?
                 outfile.write(sentence.serialize())
 
-#%%
+#%% Create a combined file per corpus of only newspaper sentences
 for conllu_file in tqdm(conllu_files):
     process(conllu_file)
