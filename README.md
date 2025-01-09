@@ -9,9 +9,10 @@ This repository contains a few Python functions for some one-off tasks with `.co
 
 ## Notes
 
-    virtualenv ~/.virtualenvs/conllu-deepl --prompt="(conllu-deepl) "
-    source ~/.virtualenvs/conllu-deepl/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
+Install dependencies in a virtual environment, e.g. with [uv](https://docs.astral.sh/uv/):
+
+    uv venv --python 3.9 --prompt="(conllu-deepl) "
+    source .venv/bin/activate
+    uv pip sync requirements.txt
 
 Scripts containing blocks marked with `#%%` can be run interactively in VSCode.
